@@ -9,11 +9,13 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * @extends ServiceEntityRepository<Product>
  *
- * @method Product|null find($id, $lockMode = null, $lockVersion = null)
- * @method Product|null findOneBy(array $criteria, array $orderBy = null)
- * @method Product[]    findAll()
- * @method Product[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Product|null find($id, $lockMode = null, $lockVersion = null)//SELECT*FROM product WHERE id=;
+ * @method Product|null findOneBy(array $criteria, array $orderBy = null)//SELECT*FROM product WHERE colonne=;
+ * @method Product[]    findAll() //SELECT* FROM product 
+ * @method Product[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)//SELECT*FROM product WHERE colonne=;
  */
+
+
 class ProductRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
