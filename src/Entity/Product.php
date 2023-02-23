@@ -26,6 +26,9 @@ class Product
     /**
      * @ORM\Column(type="integer")
      * @Assert\NotBlank(message="Ce champ est obligatoire")
+     * Assert\Positive(message="Le prix doit etre superieur à zero")
+     * Asserttype(type="integer"
+     * ,message="Saisissez un entier")
      */
     private $price;
 
