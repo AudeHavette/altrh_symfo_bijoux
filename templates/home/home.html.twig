@@ -3,10 +3,28 @@
 
 {% block body %}
 
+<div class="row justify-content-evenly mt-4">
+
+{% for product in products %}
+
+<div class="card rounded col-md-3 mt-4 p-0">
+<div class="card-header p-0">
+<img src="{{asset('upload/')}} {{product.picture}}" alt="" class="img-top img-fluid">
+</div>
+
+<div class="card-body">
+<h4>{{ product.title}}</h4>
+<h4>{{ product.price}} </h4>
+</div>
+</div>
+    
+{% endfor %}
+</div>
 
 {% endblock %}
 
 {% block title %}
+{{parent ()}} Accueil
 
 
 {% endblock %}

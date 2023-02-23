@@ -56,9 +56,14 @@
         </div>
     </nav>
     <div class="container">
-
+        {% for type, messages in app.Flashes  %}
+            {% for message in messages %}
+             <div class="alert alert-{{type}} text-center">
+             {{messsage}}
+             </div>
+            {% endfor %}
+            {% endfor %}
         {% block body %}{% endblock %}
-
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Product;
 use App\Form\ProductType;
 use App\Repository\ProductRepository;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -36,7 +37,7 @@ class ProductController extends AbstractController
         // 3eme (optionnel)=> tableau d'option
         // Le fait de renseigner ces arguments permet à Symfony d'effectuer les contrôles de validité
         // à savoir les typages de données en liens avec les types d'input de formulaire et le fait que chaque input du type (chaques add() ) correspondent bien à une propriété de la classe 
-        $form=$this->createForm(ProductType::class, $product);
+        $form=$this->createForm(ProductType::class, $product, ['add'=>true]);
         // $form est un objet instance de Form
         //traitement de la requête 
         $form->handleRequest($request); // request est la classe qui regrp tte nos superglob
@@ -79,8 +80,10 @@ class ProductController extends AbstractController
             
            $manager->persist($product); // on lui dem de persister l'objet (prep de la req)
            $manager->flush(); // on envoie l'objet en BDD (execute)
-
-           return $this->redirectToRoute("home");
+ 
+           $this->addFlash('success','produit ajouté');
+          
+           return $this->redirectToRoute("listProduct");
 
         }
 
@@ -121,10 +124,50 @@ return $this->render('product/listProduct.html.twig',[
  * @Route("/edit/{id}", name="editProduct")
  */
 
- public function editProduct()
+ public function editProduct(Product $product, Request $request, EntityManagerInterface $manager)
 
  {
+    //qd un param id est passe sur l'url et qu'on injecte en dependance une entite voulue (ici Product)
+    // symfony rempli automatiquement l'objet $product de ses donnees sur l'id passée()
+    //(SELECT*FROM product WHERE id={id})
+    //dd($product);
+    //ns sommes en modif donc pas d'instanciation de nouvel objet (pas de new Product)
+
+    $form =$this->createForm(ProductType::class, $product, ['edit'=>true]);
+
+    $form->handleRequest($request);
+    //dd($product);
+
+    if($form->isSubmitted() && $form->isValid()){
+
+        $picture_edit_file=$form->get('picture_edit')->getData();
+        
+        //on verifie si le chp picture_edit a été saisi, alors on modifie la propriété picture
+        // on copie le nouveau fichier photo et supprime le precedent 
+
+        if($picture_edit_file){
+            $picture_bdd=date('YmdHis').$picture_edit_file->getClientOriginalName();
+            unlink($this->getParameter('upload_directory').'/'.$product->getPicture());
+            $picture_edit_file->move($this->getParameter('upload_directory'), $picture_bdd);
+
+            $product->setPicture($picture_bdd);
+
+        }
+
+        $manager->persist($product);
+        $manager->flush();
+
+        $this->addFlash('success', 'Produit modifié');
+
+        return $this->redirectToRoute('listProduct');
+
+
+    }
+
+
     return $this->render('product/editProduct.html.twig', [
+        'form'=>$form->createView(),
+        'product'=>$product
 
     ]);
 
@@ -135,10 +178,17 @@ return $this->render('product/listProduct.html.twig',[
  * @Route("/delete/{id}", name="deleteProduct")
  */
 
- public function deleteProduct()
+ public function deleteProduct(Product $product, EntityManagerInterface $manager)
 
  {
-    return $this->redirectToRoute('listProduct') ;
+    unlink($this->getParameter('upload_directory').'/'.$product->getPicture());
+
+    $manager->remove($product);
+    $manager->flush();
+
+    $this->addFlash('success', 'Produit supprimé');
+
+    return $this->redirectToRoute('listProduct');
 
  }
 
